@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 STATUS_TIME = 3000
-DISPLAY_TIME = 5000
+DISPLAY_TIME = 2500
 
 NEXT_KEYS = [QtCore.Qt.Key_Right, QtCore.Qt.Key_L]
 PREVIOUS_KEYS = [QtCore.Qt.Key_Left, QtCore.Qt.Key_K]
@@ -196,7 +196,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         if source not in self.sources:
             self.sources.append(source)
-            self.sources_list.addItem(source.split('/')[-1])
+            # self.sources_list.addItem(source.split('/')[-1])
+            self.sources_list.addItem(source)
             # print('Added {}'.format(source))
         else:
             self.statusbar.showMessage('Source already added', STATUS_TIME)
@@ -259,7 +260,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         try:
             self.photo_space.setPhoto(QtGui.QPixmap(self.files[index]))
-            self.statusbar.showMessage(os.path.basename(self.files[index]))
+            # self.statusbar.showMessage(os.path.basename(self.files[index]))
+            self.statusbar.showMessage(self.files[index])
         except AttributeError:
             self.statusbar.showMessage('Couldn''t load photo {}'.format(self.files[index]), STATUS_TIME)
             self.next(inc)
