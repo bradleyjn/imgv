@@ -163,11 +163,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_pause.setFocusPolicy(QtCore.Qt.NoFocus)
         self.btn_forward = QtWidgets.QPushButton('->')
         self.btn_forward.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.btn_delete = QtWidgets.QPushButton('X')
+        self.btn_delete.setFocusPolicy(QtCore.Qt.NoFocus)
         self.btn_layout.addItem(self.left_spacer_item)
         self.btn_layout.addWidget(self.btn_back)
         self.btn_layout.addWidget(self.btn_pause)
         self.btn_layout.addWidget(self.btn_forward)
         self.btn_layout.addItem(self.right_spacer_item)
+        self.btn_layout.addWidget(self.btn_delete)
         self.btn_container.setLayout(self.btn_layout)
         self.layout.addWidget(self.btn_container)
 
@@ -176,6 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_remove.pressed.connect(self.remove_source)
         self.btn_forward.pressed.connect(self.next)
         self.btn_back.pressed.connect(partial(self.next, -1))
+        self.btn_delete.pressed.connect(self.delete)
         self.btn_pause.pressed.connect(self.play_pause)
         self.action_interval.triggered.connect(self.set_interval)
         self.action_reshuffle.triggered.connect(self.reshuffle)
@@ -245,6 +249,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.set_photo(self.index, inc)
         if self.btn_pause.text().lower() == 'pause':
             self.start_timer()
+
+    def delete(self):
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Detlete Photo")
+        msg.setText("Are you sure you want to delete this photo?")
+        msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        x = msg.exec_()
+        if x == QtWidgets.QMessageBox.Yes:
+            if self.files is not None and self.index is not None:
+                os.remove(self.files[self.index])
+                self.files.pop(self.index)
 
     def play_pause(self):
         if self.btn_pause.text().lower() == 'pause':
