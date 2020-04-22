@@ -12,6 +12,7 @@ DISPLAY_TIME = 2500
 NEXT_KEYS = [QtCore.Qt.Key_Right, QtCore.Qt.Key_L]
 PREVIOUS_KEYS = [QtCore.Qt.Key_Left, QtCore.Qt.Key_K]
 
+
 # TODO: Why do some pictures rotate?
 class PhotoViewer(QtWidgets.QGraphicsView):
     photoClicked = QtCore.pyqtSignal(QtCore.QPoint)
@@ -87,6 +88,36 @@ class PhotoViewer(QtWidgets.QGraphicsView):
         super(PhotoViewer, self).mousePressEvent(event)
 
 
+class ImagePlayer(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super(ImagePlayer, self).__init__(parent)
+
+        self.movie = None
+
+        self.movie_screen = QtWidgets.QLabel()
+        # Make label fit the gif
+        self.movie_screen.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.movie_screen.setAlignment(QtCore.Qt.AlignCenter)
+
+        # Create the layout
+        main_layout = QtWidgets.QVBoxLayout()
+        main_layout.addWidget(self.movie_screen)
+
+        self.setLayout(main_layout)
+
+    def setPhoto(self, filename=None):
+        # Load the file into a QMovie
+        self.movie = QtGui.QMovie(filename, QtCore.QByteArray(), self)
+        size = self.movie.scaledSize()
+        self.setGeometry(200, 200, size.width(), size.height())
+
+        # Add the QMovie object to the label
+        self.movie.setCacheMode(QtGui.QMovie.CacheAll)
+        self.movie.setSpeed(100)
+        self.movie_screen.setMovie(self.movie)
+        self.movie.start()
+
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -143,9 +174,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dock_sources)
 
         # photo viewer
+        self.photo_layout = QtWidgets.QHBoxLayout()
         self.photo_space = PhotoViewer(self)
         self.photo_space.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.layout.addWidget(self.photo_space)
+        self.photo_layout.addWidget(self.photo_space)
+        self.layout.addLayout(self.photo_layout)
+
+        # gif viewer
+        self.gif_layout = QtWidgets.QHBoxLayout()
+        self.gif_viewer = ImagePlayer(self)
+        self.gif_viewer.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.gif_layout.addWidget(self.photo_space)
+        self.layout.addLayout(self.photo_layout)
+
+        self.gif_viewer.show()
+        self.gif_viewer.setPhoto("giphy.gif")
 
         # buttons
         self.btn_container = QtWidgets.QGroupBox()
@@ -329,9 +372,23 @@ class MainWindow(QtWidgets.QMainWindow):
         event.accept()
 
 
-if __name__ == '__main__':
+def main():
     import sys
     app = QtWidgets.QApplication(sys.argv)
     mainWin = MainWindow()
     mainWin.show()
     sys.exit(app.exec_())
+
+
+def test():
+    import sys
+    gif = "giphy.gif"
+    app = QtWidgets.QApplication(sys.argv)
+    player = ImagePlayer(gif, "was")
+    player.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
+    # test()
